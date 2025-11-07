@@ -1,4 +1,17 @@
 from address_book import AddressBook, Record
+import pickle
+
+
+def save_data(contacts, filename="addressbook.pkl"):
+    with open(filename, "wb") as f:
+        pickle.dump(contacts, f)
+
+def load_data(filename="addressbook.pkl"):
+    try:
+        with open(filename, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return AddressBook()
 
 
 def input_error(func):
@@ -101,7 +114,7 @@ def show_phone(args: list, contacts: AddressBook):
 
 
 @input_error
-def birthdays(args, contacts: AddressBook):
+def birthdays(contacts: AddressBook):
     upcomming_birthdays = contacts.get_upcoming_birthdays()
 
     if not upcomming_birthdays:
@@ -123,43 +136,48 @@ def show_all(contacts: AddressBook):
         
 
 def main():
-    contacts = AddressBook()
+    contacts = load_data()
     print("Welcome to the assistant bot!")
-    while True:
-        user_input = input("Enter a command: ")
-        command, *args = parse_input(user_input)
+    
+    try:
+        while True:
+            user_input = input("Enter a command: ")
+            command, *args = parse_input(user_input)
 
-        if command in ["close", "exit"]:
-            print("Good bye!")
-            break
+            if command in ["close", "exit"]:
+                print("Good bye!")
+                break
 
-        elif command == "hello":
-            print("How can I help you?")
+            elif command == "hello":
+                print("How can I help you?")
 
-        elif command == "add":
-            print(add_contact(args, contacts))
+            elif command == "add":
+                print(add_contact(args, contacts))
 
-        elif command == "change":
-            print(change_contact(args,contacts))
+            elif command == "change":
+                print(change_contact(args,contacts))
 
-        elif command == "phone":
-            print(show_phone(args,contacts))
+            elif command == "phone":
+                print(show_phone(args,contacts))
 
-        elif command == "all":
-            print(show_all(contacts))
+            elif command == "all":
+                print(show_all(contacts))
 
-        elif command == "add_birthday":
-            print(add_birthday(args,contacts))
+            elif command == "add_birthday":
+                print(add_birthday(args,contacts))
 
-        elif command == "show_birthday":
-            print(show_birthday(args,contacts))
+            elif command == "show_birthday":
+                print(show_birthday(args,contacts))
 
-        elif command == "birthdays":
-            print(birthdays(args,contacts))
+            elif command == "birthdays":
+                print(birthdays(contacts))
 
-        else:
-            print("Invalid command.")
-
+            else:
+                print("Invalid command.")
+    except KeyboardInterrupt:
+        save_data(contacts)
+    finally:
+        save_data(contacts)
 if __name__ == "__main__":
     main()
 
